@@ -1,41 +1,59 @@
-// Espera o DOM (a página) ser completamente carregado para executar o código
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', () => {
 
-    // Pega as referências dos elementos do HTML que vamos usar
-    const loginForm = document.getElementById('login-form');
-    const emailInput = document.getElementById('email');
-    const passwordInput = document.getElementById('password');
-    const errorMessage = document.getElementById('error-message');
+    // 1. CARROSSEL INTERATIVO (Pausing)
+    const carrosselSlide = document.querySelector('.carrossel-slide');
+    if (carrosselSlide) {
+        // Pausa a animação quando o mouse está sobre o carrossel
+        const carrosselContainer = document.querySelector('.carrossel-container');
 
-    // Adiciona um "escutador de evento" ao formulário.
-    // Ele vai disparar a função quando o formulário for enviado (pelo clique no botão)
-    loginForm.addEventListener('submit', function(event) {
-        
-        // event.preventDefault() impede o comportamento padrão do formulário,
-        // que é recarregar a página.
-        event.preventDefault();
+        carrosselContainer.addEventListener('mouseenter', () => {
+             // Pausa a animação via JavaScript
+             carrosselSlide.style.animationPlayState = 'paused'; 
+        });
 
-        // Pega os valores digitados pelo usuário e remove espaços em branco
-        const email = emailInput.value.trim();
-        const password = passwordInput.value.trim();
+        carrosselContainer.addEventListener('mouseleave', () => {
+             // Retoma a animação
+             carrosselSlide.style.animationPlayState = 'running'; 
+        });
+    }
 
-        // --- LÓGICA DE VALIDAÇÃO (EXEMPLO) ---
-        // Em um sistema real, isso seria enviado para um servidor.
-        // Aqui, vamos apenas comparar com valores fixos.
-        
-        const emailCorreto = "usuario@exemplo.com";
-        const senhaCorreta = "senha123";
+    // 2. SCROLL REVEAL (Animação de entrada ao rolar)
+    const estudanteDivs = document.querySelectorAll('.estudante-div');
 
-        if (email === emailCorreto && password === senhaCorreta) {
-            // Se o login estiver correto
-            errorMessage.textContent = ""; // Limpa a mensagem de erro
-            alert("Login bem-sucedido! Bem-vindo!");
-            // Aqui você poderia redirecionar o usuário para outra página
-            // window.location.href = "outra-pagina.html";
-        } else {
-            // Se o login estiver incorreto
-            errorMessage.textContent = "Email ou senha incorretos. Tente novamente.";
-        }
+    const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                // Adiciona a classe 'is-visible' (definida no CSS)
+                entry.target.classList.add('is-visible'); 
+                // Para de observar depois que aparece
+                observer.unobserve(entry.target); 
+            }
+        });
+    }, {
+        threshold: 0.1 // 10% do elemento precisa estar visível
     });
+
+    estudanteDivs.forEach((div, index) => {
+        // Adiciona um pequeno delay baseado na posição (para efeito cascata)
+        div.style.transitionDelay = `${index * 0.1}s`; 
+        
+        // Adiciona a classe inicial de opacidade (você já tinha no CSS)
+        div.classList.add('fade-in-on-scroll'); 
+        
+        observer.observe(div);
+    });
+
+    // 3. ADICIONAR FUNCIONALIDADE DE LOGIN NO HEADER
+    // ------------------------------------------------------------------
+    // Vamos adicionar um botão "Login" no cabeçalho via HTML (veja abaixo)
+    // Este código JS garante que ao clicar, o usuário seja direcionado
+    // ------------------------------------------------------------------
+    const loginButton = document.getElementById('login-btn');
+    if (loginButton) {
+        loginButton.addEventListener('click', () => {
+            // Redireciona para a nova página de login
+            window.location.href = 'login.html'; 
+        });
+    }
 
 });
